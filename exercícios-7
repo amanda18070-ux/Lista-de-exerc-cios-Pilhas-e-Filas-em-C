@@ -1,0 +1,154 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 5 // Capacidade máxima de senhas simultâneas na fila da secretaria
+typedef struct {
+    int senhas[MAX]; // Vetor que armazena os números das senhas
+    int inicio;      // Índice da próxima senha a ser atendida (início da fila)
+    int fim;         // Índice da próxima posição livre no final da fila
+} FilaSenhas;
+
+void inicializar(FilaSenhas *f) {
+    f->inicio = 0;
+    f->fim = 0;
+}
+
+int estaVazia(const FilaSenhas *f) {
+    return (f->inicio == f->fim);
+}
+
+int estaCheia(const FilaSenhas *f) {
+    return (f->fim == MAX);
+}
+
+void gerarSenha(FilaSenhas *f, int *proximaSenha) {
+    if (estaCheia(f)) {
+        printf("\n[Fila Cheia] Capacidade maxima atingida! Nao e possivel gerar nova senha agora.\n");
+        return;
+    }
+    int senhaGerada = *proximaSenha; // Obtém o número atual da senha
+    f->senhas[f->fim] = senhaGerada; // Insere a senha no final da fila
+    f->fim++;                        // Avança o índice 'fim'
+    (*proximaSenha)++;               // Incrementa o gerador somente após inserção bem-sucedida
+    printf("\nSenha #%d gerada e adicionada ao final da fila.\n", senhaGerada);
+}
+
+int chamarProximaSenha(FilaSenhas *f, int *senhaChamada) {
+    if (estaVazia(f)) {
+        printf("\n[Fila Vazia] Nao ha senhas aguardando atendimento no momento.\n");
+        return 0;
+    }
+    *senhaChamada = f->senhas[f->inicio]; // Recupera a primeira senha da fila
+    f->inicio++;                          // Avança o índice 'inicio' (remoção lógica)
+    return 1;
+}
+
+/*
+ * Finalidade: Consultar qual é a próxima senha a ser chamada sem removê-la da fila.
+ * Parâmetros: Ponteiro constante para a fila (garante que a fila não seja modificada).
+ */
+void consultarProximaSenha(const FilaSenhas *f) {
+    if (estaVazia(f)) {
+        printf("\n[Fila Vazia] Nenhuma senha aguardando atendimento.\n");
+        return;
+    }
+    printf("\nProxima senha a ser chamada: #%d\n", f->senhas[f->inicio]);
+}
+void mostrarSenhasAguardando(const FilaSenhas *f) {
+    if (estaVazia(f)) {
+        printf("\nNenhuma senha aguardando atendimento.\n");
+        return;
+    }
+    printf("\n--- Senhas Aguardando Atendimento (Inicio -> Fim) ---\n");
+    for (int i = f->inicio; i < f->fim; i++) {
+        printf("[ Senha #%d ] ", f->senhas[i]);
+    }
+    printf("\n-----------------------------------------------------\n");
+}
+void executarTesteObrigatorio() {
+    FilaSenhas filaTeste;
+    int geradorTeste = 1; // Inicia a numeração das senhas em 1
+    int chamada1, chamada2;
+
+    inicializar(&filaTeste);
+
+    printf("\n=====================================================\n");
+    printf("             EXECUTANDO TESTE OBRIGATORIO            \n");
+    printf("=====================================================\n");
+
+    // 1. Gerando três senhas (1, 2 e 3)
+    gerarSenha(&filaTeste, &geradorTeste);
+    gerarSenha(&filaTeste, &geradorTeste);
+    gerarSenha(&filaTeste, &geradorTeste);
+
+    mostrarSenhasAguardando(&filaTeste);
+
+    printf("\nRealizando dois atendimentos...\n");
+    if (chamarProximaSenha(&filaTeste, &chamada1)) {
+        printf("1o atendimento: Senha #%d\n", chamada1);
+    }
+    if (chamarProximaSenha(&filaTeste, &chamada2)) {
+        printf("2o atendimento: Senha #%d\n", chamada2);
+    }
+
+    // 3. Apresentando ordem das chamadas e senhas restantes
+    printf("\n--- Registro do Teste ---\n");
+    printf("Ordem das chamadas realizadas: Senha #%d, depois Senha #%d\n", chamada1, chamada2);
+    printf("Senhas restantes na fila:");
+    mostrarSenhasAguardando(&filaTeste);
+    printf("=====================================================\n");
+}
+
+int main() {
+    FilaSenhas fila;       // Instância da fila da secretaria
+    int contadorSenha = 1; // Controla a geração automática de senhas a partir de 1
+    int opcao;             // Opção selecionada no menu
+    int senhaAtendida;     // Armazena o número da senha chamada no atendimento
+
+    inicializar(&fila);
+
+    do {
+        printf("\n=== ATENDIMENTO POR SENHAS - SECRETARIA ===\n");
+        printf("1. Gerar nova senha\n");
+        printf("2. Chamar proxima senha (Atender)\n");
+        printf("3. Consultar proxima senha\n");
+        printf("4. Mostrar todas as senhas aguardando\n");
+        printf("5. Executar teste obrigatorio (3 senhas, 2 atendimentos)\n");
+        printf("0. Sair\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                gerarSenha(&fila, &contadorSenha);
+                break;
+
+            case 2:
+                if (chamarProximaSenha(&fila, &senhaAtendida)) {
+                    printf("\n[Atendimento] Chamando Senha #%d para o guiche!\n", senhaAtendida);
+                }
+                break;
+
+            case 3:
+                consultarProximaSenha(&fila);
+                break;
+
+            case 4:
+                mostrarSenhasAguardando(&fila);
+                break;
+
+            case 5:
+                executarTesteObrigatorio();
+                break;
+
+            case 0:
+                printf("\nEncerrando o sistema de senhas da secretaria...\n");
+                break;
+
+            default:
+                printf("\n[Erro] Opcao invalida! Tente novamente.\n");
+        }
+    } while (opcao != 0);
+
+    return 0;
+}
