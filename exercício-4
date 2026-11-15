@@ -1,0 +1,97 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 32 // Capacidade máxima ajustada para comportar números inteiros de até 32 bits
+
+typedef struct {
+    int bits[MAX]; // Vetor que armazena os restos das divisões por 2
+    int topo;      // Índice do elemento no topo (-1 indica pilha vazia)
+} Pilha;
+
+void inicializar(Pilha *p) {
+    p->topo = -1;
+}
+
+int estaVazia(const Pilha *p) {
+    return (p->topo == -1);
+}
+
+int estaCheia(const Pilha *p) {
+    return (p->topo == MAX - 1);
+}
+
+/*
+ * Finalidade: Empilhar um resto de divisão por 2 (bit 0 ou 1) no topo da pilha (Push).
+ * Parâmetros: Ponteiro para a pilha e o bit (resto) a ser armazenado.
+ * Retorno: 1 se empilhou com sucesso, 0 se a pilha estiver cheia.
+ */
+int empilhar(Pilha *p, int bit) {
+    if (estaCheia(p)) {
+        printf("\n[Erro] Pilha cheia! O numero excede o limite de %d bits.\n", MAX);
+        return 0;
+    }
+    p->topo++;              // Avança o índice do topo
+    p->bits[p->topo] = bit; // Armazena o resto na nova posição do topo
+    return 1;
+}
+
+/*
+ * Finalidade: Desempilhar o bit do topo da pilha para exibição (Pop - princípio LIFO).
+ * Parâmetros: Ponteiro para a pilha e ponteiro para receber o bit retirado.
+ * Retorno: 1 se a remoção foi bem-sucedida, 0 se a pilha estiver vazia.
+ */
+int desempilhar(Pilha *p, int *bitRetirado) {
+    if (estaVazia(p)) {
+        printf("\n[Erro] Pilha vazia! Nao ha bits para desempilhar.\n");
+        return 0;
+    }
+    *bitRetirado = p->bits[p->topo]; // Recupera o bit do topo
+    p->topo--;                       // Decrementa o topo (remoção lógica)
+    return 1;
+}
+
+int main() {
+    Pilha p;           // Instância da pilha utilizada para inverter os restos das divisões
+    int numero;        // Número decimal informado pelo usuário
+    int quociente;     // Variável auxiliar para realizar as divisões sucessivas por 2
+    int resto;         // Armazena o resto de cada divisão (0 ou 1)
+    int bit;           // Armazena o bit desempilhado durante a exibição
+
+    inicializar(&p);
+
+    // Leitura e validação: rejeita entradas negativas
+    do {
+        printf("Digite um numero inteiro nao negativo para converter em binario: ");
+        scanf("%d", &numero);
+
+        if (numero < 0) {
+            printf("[Erro] Entradas negativas nao sao permitidas! Tente novamente.\n\n");
+        }
+    } while (numero < 0);
+
+    // Tratamento específico para a entrada 0
+    if (numero == 0) {
+        empilhar(&p, 0);
+    } else {
+        // Processo de divisões sucessivas por 2
+        quociente = numero;
+        while (quociente > 0) {
+            resto = quociente % 2; // Obtém o bit menos significativo atual
+            if (!empilhar(&p, resto)) {
+                return 1; // Encerra caso ultrapasse a capacidade MAX
+            }
+            quociente = quociente / 2; // Atualiza o quociente para a próxima divisão
+        }
+    }
+
+    // Desempilhamento para apresentar o número binário na ordem correta (MSB -> LSB)
+    printf("Representacao binaria de %d: ", numero);
+    while (!estaVazia(&p)) {
+        if (desempilhar(&p, &bit)) {
+            printf("%d", bit);
+        }
+    }
+    printf("\n");
+
+    return 0;
+}
