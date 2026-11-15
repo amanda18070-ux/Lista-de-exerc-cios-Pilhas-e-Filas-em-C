@@ -1,0 +1,120 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 5 // Capacidade máxima de estados anteriores armazenados no histórico
+
+typedef struct {
+    int itens[MAX]; // Vetor que armazena os valores anteriores
+    int topo;       // Índice do elemento no topo (-1 indica histórico vazio)
+} PilhaHistorico;
+
+void inicializar(PilhaHistorico *p) {
+    p->topo = -1;
+}
+
+int estaVazia(const PilhaHistorico *p) {
+    return (p->topo == -1);
+}
+
+int estaCheia(const PilhaHistorico *p) {
+    return (p->topo == MAX - 1);
+}
+
+    if (estaCheia(p)) {
+        return 0;
+    }
+    p->topo++;                 // Avança o índice do topo
+    p->itens[p->topo] = valor; // Armazena o valor anterior no topo
+    return 1;
+}
+
+int desempilhar(PilhaHistorico *p, int *valorRecuperado) {
+    if (estaVazia(p)) {
+        return 0;
+    }
+    *valorRecuperado = p->itens[p->topo]; // Recupera o estado anterior
+    p->topo--;                            // Decrementa o topo (remoção lógica)
+    return 1;
+}
+
+void alterarValor(PilhaHistorico *p, int *valorAtual, int novoValor) {
+    if (!empilhar(p, *valorAtual)) {
+        printf("\n[Erro] Historico cheio (capacidade maxima de %d)! Alteracao rejeitada.\n", MAX);
+        printf("O valor atual (%d) e o historico foram preservados.\n", *valorAtual);
+        return;
+    }
+    *valorAtual = novoValor; // Substitui pelo novo valor somente após salvar o anterior
+    printf("\nValor alterado com sucesso para: %d\n", *valorAtual);
+}
+
+void desfazerAlteracao(PilhaHistorico *p, int *valorAtual) {
+    int valorAnterior;
+    if (!desempilhar(p, &valorAnterior)) {
+        printf("\n[Aviso] Nao ha historico disponivel. Nao e possivel desfazer.\n");
+        return;
+    }
+    *valorAtual = valorAnterior; // Restaura o valor recuperado da pilha
+    printf("\nOperacao desfeita! Valor atual restaurado para: %d\n", *valorAtual);
+}
+    printf("\n--- Estado Atual ---\n");
+    printf("Valor atual: %d\n", valorAtual);
+
+    if (estaVazia(p)) {
+        printf("Historico disponivel: Vazio\n");
+    } else {
+        printf("Historico disponivel (mais recente -> mais antigo): ");
+        for (int i = p->topo; i >= 0; i--) {
+            printf("%d", p->itens[i]);
+            if (i > 0) {
+                printf(" -> ");
+            }
+        }
+        printf("\n");
+    }
+    printf("--------------------\n");
+}
+
+int main() {
+    PilhaHistorico historico; // Pilha que armazena os estados anteriores
+    int valorAtual = 0;       // Valor inteiro controlado pelo programa, iniciado em 0
+    int opcao;                // Opção escolhida pelo usuário no menu
+    int novoValor;            // Novo valor informado pelo usuário na alteração
+
+    inicializar(&historico);
+
+    do {
+        printf("\n=== CONTROLE DE HISTORICO (DESFAZER) ===\n");
+        printf("Valor atual: %d\n", valorAtual);
+        printf("1. Alterar valor\n");
+        printf("2. Desfazer ultima alteracao\n");
+        printf("3. Consultar valor atual e historico\n");
+        printf("0. Sair\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                printf("Digite o novo valor inteiro: ");
+                scanf("%d", &novoValor);
+                alterarValor(&historico, &valorAtual, novoValor);
+                break;
+
+            case 2:
+                desfazerAlteracao(&historico, &valorAtual);
+                break;
+
+            case 3:
+                consultarEstado(&historico, valorAtual);
+                break;
+
+            case 0:
+                printf("\nEncerrando o programa...\n");
+                break;
+
+            default:
+                printf("\n[Erro] Opcao invalida! Tente novamente.\n");
+        }
+    } while (opcao != 0);
+
+    return 0;
+}
