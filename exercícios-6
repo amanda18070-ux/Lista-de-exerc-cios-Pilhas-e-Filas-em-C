@@ -1,0 +1,120 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 5 // Capacidade máxima da fila estática
+
+typedef struct {
+    int itens[MAX]; // Vetor que armazena os elementos da fila
+    int inicio;     // Índice do primeiro elemento da fila (próximo a sair)
+    int fim;        // Índice da próxima posição livre para inserção
+} Fila;
+
+void inicializar(Fila *f) {
+    f->inicio = 0;
+    f->fim = 0;
+}
+int estaVazia(const Fila *f) {
+    return (f->inicio == f->fim);
+}
+
+int estaCheia(const Fila *f) {
+    return (f->fim == MAX);
+}
+
+void enfileirar(Fila *f, int valor) {
+    if (estaCheia(f)) {
+        printf("\n[Erro] Fila cheia! Nao e possivel inserir %d.\n", valor);
+        return;
+    }
+    f->itens[f->fim] = valor; // Armazena o valor na posição apontada por 'fim'
+    f->fim++;                 // Avança o índice 'fim'
+    printf("\nElemento %d inserido no final da fila.\n", valor);
+}
+
+int desenfileirar(Fila *f, int *valorRemovido) {
+    if (estaVazia(f)) {
+        printf("\n[Erro] Fila vazia! Nao ha elementos para remover.\n");
+        return 0;
+    }
+    *valorRemovido = f->itens[f->inicio]; 
+    f->inicio++;                         
+    return 1;
+}
+
+void exibir(const Fila *f) {
+    if (estaVazia(f)) {
+        printf("\nA fila esta vazia.\n");
+        return;
+    }
+    printf("\n--- Conteudo da Fila (Inicio -> Fim) ---\n");
+    for (int i = f->inicio; i < f->fim; i++) {
+        printf("[ %d ] ", f->itens[i]);
+    }
+    printf("\n----------------------------------------\n");
+}
+
+void consultarInicio(const Fila *f) {
+    // Validação para evitar acesso a posições inválidas quando a fila estiver vazia
+    if (estaVazia(f)) {
+        printf("\n[Aviso] A fila esta vazia. Nao ha elemento no inicio para consultar.\n");
+        return;
+    }
+    // Lê o elemento na posição 'inicio' sem incrementar 'inicio'
+    printf("\nProximo elemento da fila (inicio): %d\n", f->itens[f->inicio]);
+}
+
+
+int main() {
+    Fila f;    
+    int opcao; 
+    int valor; 
+
+    inicializar(&f);
+
+    do {
+        printf("\n=== MENU - FILA ESTATICA ===\n");
+        printf("1. Inserir na fila (Enfileirar)\n");
+        printf("2. Remover da fila (Desenfileirar)\n");
+        printf("3. Exibir fila\n");
+        printf("4. Consultar proximo elemento (Inicio)\n");
+        printf("5. Quantidade de elementos aguardando\n");
+        printf("0. Sair\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                printf("Digite o valor a inserir: ");
+                scanf("%d", &valor);
+                enfileirar(&f, valor);
+                break;
+
+            case 2:
+                if (desenfileirar(&f, &valor)) {
+                    printf("\nElemento removido do inicio: %d\n", valor);
+                }
+                break;
+
+            case 3:
+                exibir(&f);
+                break;
+
+            case 4:
+                consultarInicio(&f);
+                break;
+
+            case 5:
+                printf("\nQuantidade de elementos aguardando na fila: %d\n", quantidadeElementos(&f));
+                break;
+
+            case 0:
+                printf("\nEncerrando o programa...\n");
+                break;
+
+            default:
+                printf("\n[Erro] Opcao invalida! Tente novamente.\n");
+        }
+    } while (opcao != 0);
+
+    return 0;
+}
