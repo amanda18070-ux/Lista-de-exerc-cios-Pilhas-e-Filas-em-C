@@ -1,0 +1,117 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 5 // Capacidade máxima da pilha
+
+typedef struct {
+    int itens[MAX]; // Vetor que armazena os elementos da pilha
+    int topo;       // Índice do elemento no topo (-1 indica pilha vazia)
+} Pilha;
+
+void inicializar(Pilha *p) {
+    p->topo = -1;
+}
+
+int estaVazia(Pilha *p) {
+    return (p->topo == -1);
+}
+
+int estaCheia(Pilha *p) {
+    return (p->topo == MAX - 1);
+}
+
+    if (estaCheia(p)) {
+        printf("\n[Erro] Pilha cheia! Nao e possivel empilhar %d.\n", valor);
+        return;
+    }
+    p->topo++;                 // Avança o índice do topo
+    p->itens[p->topo] = valor; // Armazena o valor na nova posição do topo
+    printf("\nElemento %d empilhado com sucesso.\n", valor);
+}
+
+int desempilhar(Pilha *p, int *valorRemovido) {
+    if (estaVazia(p)) {
+        printf("\n[Erro] Pilha vazia! Nao ha elementos para remover.\n");
+        return 0; // Falha na operação
+    }
+    *valorRemovido = p->itens[p->topo]; // Recupera o valor do topo atual
+    p->topo--;                          // Decrementa o topo (remoção lógica)
+    return 1; // Sucesso na operação
+}
+
+    if (estaVazia(p)) {
+        printf("\nA pilha esta vazia.\n");
+        return;
+    }
+    printf("\n--- Conteudo da Pilha (Topo -> Base) ---\n");
+    for (int i = p->topo; i >= 0; i--) {
+        printf("| %d |\n", p->itens[i]);
+    }
+    printf("----------------------------------------\n");
+}
+
+    if (p->topo == -1) {
+        printf("\n[Aviso] A pilha esta vazia. Nao ha topo para consultar.\n");
+        return;
+    }
+    printf("\nElemento no topo da pilha: %d\n", p->itens[p->topo]);
+}
+
+int quantidadeElementos(const Pilha *p) {
+    return p->topo + 1;
+}
+
+int main() {
+    Pilha p;   // Instância da estrutura Pilha
+    int opcao; // Armazena a escolha do usuário no menu
+    int valor; // Armazena o valor a ser inserido ou removido
+
+    inicializar(&p);
+
+    do {
+        printf("\n=== MENU - PILHA ESTATICA ===\n");
+        printf("1. Empilhar (Push)\n");
+        printf("2. Desempilhar (Pop)\n");
+        printf("3. Exibir pilha\n");
+        printf("4. Consultar topo\n");
+        printf("5. Quantidade de elementos\n");
+        printf("0. Sair\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                printf("Digite o valor a empilhar: ");
+                scanf("%d", &valor);
+                empilhar(&p, valor);
+                break;
+
+            case 2:
+                if (desempilhar(&p, &valor)) {
+                    printf("\nElemento desempilhado: %d\n", valor);
+                }
+                break;
+
+            case 3:
+                exibir(&p);
+                break;
+
+            case 4:
+                consultarTopo(&p);
+                break;
+
+            case 5:
+                printf("\nQuantidade de elementos armazenados: %d\n", quantidadeElementos(&p));
+                break;
+
+            case 0:
+                printf("\nEncerrando o programa...\n");
+                break;
+
+            default:
+                printf("\n[Erro] Opcao invalida! Tente novamente.\n");
+        }
+    } while (opcao != 0);
+
+    return 0;
+}
