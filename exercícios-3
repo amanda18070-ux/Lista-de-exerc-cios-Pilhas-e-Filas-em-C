@@ -1,0 +1,101 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 10 // Capacidade máxima de elementos na pilha
+
+// Estrutura que representa a pilha estática
+typedef struct {
+    int itens[MAX]; // Vetor para armazenar a sequência de números inteiros
+    int topo;       // Índice do elemento no topo (-1 indica pilha vazia)
+} Pilha;
+
+// Inicializa a pilha definindo o topo como -1 (vazia)
+void inicializar(Pilha *p) {
+    p->topo = -1;
+}
+
+// Verifica se a pilha está vazia (retorna 1 se verdadeira, 0 caso contrário)
+int estaVazia(const Pilha *p) {
+    return (p->topo == -1);
+}
+
+// Verifica se a pilha atingiu a capacidade máxima MAX
+int estaCheia(const Pilha *p) {
+    return (p->topo == MAX - 1);
+}
+
+/*
+ * Finalidade: Inserir um número inteiro no topo da pilha (Operação Push).
+ * Parâmetros: Ponteiro para a pilha e o valor inteiro a ser empilhado.
+ * Retorno: 1 se empilhou com sucesso, 0 se a pilha estiver cheia.
+ */
+int empilhar(Pilha *p, int valor) {
+    if (estaCheia(p)) {
+        printf("\n[Erro] Pilha cheia! Nao e possivel empilhar o valor %d.\n", valor);
+        return 0;
+    }
+    p->topo++;                 // Avança o topo
+    p->itens[p->topo] = valor; // Insere o número na nova posição do topo
+    return 1;
+}
+
+/*
+ * Finalidade: Remover o elemento do topo da pilha e devolvê-lo ao programa (Operação Pop - LIFO).
+ * Parâmetros: Ponteiro para a pilha e ponteiro para armazenar o valor retirado.
+ * Retorno: 1 se a remoção foi bem-sucedida, 0 se a pilha estiver vazia.
+ */
+int desempilhar(Pilha *p, int *valorRetirado) {
+    if (estaVazia(p)) {
+        printf("\n[Erro] Pilha vazia! Nao ha elementos para desempilhar.\n");
+        return 0;
+    }
+    *valorRetirado = p->itens[p->topo]; // Copia o valor do topo para a variável do programa
+    p->topo--;                          // Decrementa o topo (remoção lógica)
+    return 1;
+}
+
+int main() {
+    Pilha p;           // Instância da pilha utilizada para inverter a sequência
+    int quantidade;    // Quantidade de números informada pelo usuário (entre 1 e MAX)
+    int numero;        // Variável auxiliar para leitura e desempilhamento dos valores
+
+    inicializar(&p);
+
+    // Validação da quantidade de elementos entre 1 e MAX
+    do {
+        printf("Informe a quantidade de numeros (entre 1 e %d): ", MAX);
+        scanf("%d", &quantidade);
+
+        if (quantidade < 1 || quantidade > MAX) {
+            printf("[Erro] Quantidade invalida! Digite um valor entre 1 e %d.\n\n", MAX);
+        }
+    } while (quantidade < 1 || quantidade > MAX);
+
+    // Leitura e empilhamento dos valores na ordem de entrada
+    printf("\nDigite os %d numeros inteiros:\n", quantidade);
+    for (int i = 0; i < quantidade; i++) {
+        printf("Numero %d: ", i + 1);
+        scanf("%d", &numero);
+        empilhar(&p, numero);
+    }
+
+    // Desempilhamento e exibição na ordem inversa (princípio LIFO)
+    printf("\nSequencia na ordem inversa: ");
+    while (!estaVazia(&p)) {
+        if (desempilhar(&p, &numero)) {
+            printf("%d", numero);
+            // Formata com vírgula apenas enquanto ainda restarem elementos na pilha
+            if (!estaVazia(&p)) {
+                printf(", ");
+            }
+        }
+    }
+    printf("\n");
+
+    // Verificação final garantindo que a pilha terminou vazia
+    if (estaVazia(&p)) {
+        printf("Status final: A pilha esta vazia.\n");
+    }
+
+    return 0;
+}
