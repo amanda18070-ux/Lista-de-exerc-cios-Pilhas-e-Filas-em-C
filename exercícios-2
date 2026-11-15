@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 5 // Capacidade máxima de 5 bandejas na pilha da lanchonete
+
+typedef struct {
+    int bandejas[MAX]; // Vetor que armazena os números de identificação das bandejas
+    int topo;          // Índice da bandeja no topo (-1 indica que não há bandejas)
+} PilhaBandejas;
+
+void inicializar(PilhaBandejas *p) {
+    p->topo = -1;
+}
+
+int estaVazia(const PilhaBandejas *p) {
+    return (p->topo == -1);
+}
+
+int estaCheia(const PilhaBandejas *p) {
+    return (p->topo == MAX - 1);
+}
+ adicionarBandeja(PilhaBandejas *p, int idBandeja) {
+    if (estaCheia(p)) {
+        printf("\n[Suporte Cheio] Capacidade maxima de %d bandejas atingida! Nao e possivel empilhar a bandeja #%d.\n", MAX, idBandeja);
+        return;
+    }
+    p->topo++;                      // Avança o índice do topo
+    p->bandejas[p->topo] = idBandeja; // Coloca a nova bandeja no topo
+    printf("\nBandeja #%d adicionada ao topo da pilha.\n", idBandeja);
+}
+
+int retirarBandeja(PilhaBandejas *p, int *idRetirada) {
+    if (estaVazia(p)) {
+        printf("\n[Sem Bandejas] Nao ha bandejas disponiveis para retirada no momento.\n");
+        return 0;
+    }
+    
+void consultarProximaBandeja(const PilhaBandejas *p) {
+    if (estaVazia(p)) {
+        printf("\n[Sem Bandejas] O suporte esta vazio. Nenhuma bandeja disponivel.\n");
+        return;
+    }
+    printf("\nProxima bandeja disponivel no
