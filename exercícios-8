@@ -1,0 +1,120 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 5 // Capacidade máxima de trabalhos simultâneos na fila da impressora
+typedef struct {
+    int trabalhos[MAX]; // Vetor que armazena os identificadores inteiros dos trabalhos
+    int inicio;         // Índice do próximo trabalho a ser impresso (início da fila)
+    int fim;            // Índice da próxima posição livre no final da fila
+} FilaImpressao;
+
+
+void inicializar(FilaImpressao *f) {
+    f->inicio = 0;
+    f->fim = 0;
+}
+
+int estaVazia(const FilaImpressao *f) {
+    return (f->inicio == f->fim);
+}
+
+int estaCheia(const FilaImpressao *f) {
+    return (f->fim == MAX);
+}
+
+void adicionarTrabalho(FilaImpressao *f, int idTrabalho) {
+    if (estaCheia(f)) {
+        printf("\n[Fila Cheia] Memoria da impressora lotada! Nao e possivel adicionar o trabalho #%d.\n", idTrabalho);
+        return;
+    }
+    f->trabalhos[f->fim] = idTrabalho; // Armazena o trabalho no final da fila
+    f->fim++;                          // Avança o índice 'fim'
+    printf("\nTrabalho #%d adicionado a fila de impressao.\n", idTrabalho);
+}
+int imprimirProximo(FilaImpressao *f, int *idImpresso) {
+    if (estaVazia(f)) {
+        return 0;
+    }
+    *idImpresso = f->trabalhos[f->inicio]; // Obtém o trabalho mais antigo na fila
+    f->inicio++;                           // Avança o índice 'inicio' (remoção lógica)
+    return 1;
+}
+
+void listarPendentes(const FilaImpressao *f) {
+    if (estaVazia(f)) {
+        printf("\nNenhum trabalho pendente na fila de impressao.\n");
+        return;
+    }
+    printf("\n--- Trabalhos Pendentes (Ordem de Impressao: Inicio -> Fim) ---\n");
+    for (int i = f->inicio; i < f->fim; i++) {
+        printf("[ Trabalho #%d ] ", f->trabalhos[i]);
+    }
+    printf("\n----------------------------------------------------------------\n");
+}
+
+void imprimirTodos(FilaImpressao *f) {
+    if (estaVazia(f)) {
+        printf("\n[Aviso] A fila de impressao esta vazia. Nenhum trabalho para imprimir.\n");
+        return;
+    }
+
+    int idAtual;
+    printf("\n--- Iniciando Impressao em Lote (FIFO) ---\n");
+    // Remove e processa um trabalho por vez usando imprimirProximo até esvaziar a fila
+    while (imprimirProximo(f, &idAtual)) {
+        printf("Imprimindo trabalho #%d... Concluido!\n", idAtual);
+    }
+    printf("Todos os trabalhos da fila foram impressos.\n");
+    printf("------------------------------------------\n");
+}
+
+int main() {
+    FilaImpressao impressora; 
+    int opcao;                
+    int idTrabalho;           
+    inicializar(&impressora);
+
+    do {
+        printf("\n=== GERENCIADOR DE FILA DE IMPRESSAO ===\n");
+        printf("1. Adicionar trabalho\n");
+        printf("2. Imprimir proximo trabalho\n");
+        printf("3. Listar trabalhos pendentes\n");
+        printf("4. Imprimir todos os trabalhos\n");
+        printf("0. Sair\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                printf("Informe o identificador inteiro do trabalho: ");
+                scanf("%d", &idTrabalho);
+                adicionarTrabalho(&impressora, idTrabalho);
+                break;
+
+            case 2:
+                if (imprimirProximo(&impressora, &idTrabalho)) {
+                    printf("\n[Impressao] Trabalho #%d impresso com sucesso!\n", idTrabalho);
+                } else {
+                    printf("\n[Aviso] Fila vazia! Nao ha trabalhos para imprimir.\n");
+                }
+                break;
+
+            case 3:
+                listarPendentes(&impressora);
+                break;
+
+            case 4:
+                imprimirTodos(&impressora);
+                break;
+
+            case 0:
+                printf("\nEncerrando o gerenciador de impressao...\n");
+                break;
+
+            default:
+                printf("\n[Erro] Opcao invalida! Tente novamente.\n");
+        }
+    } while (opcao != 0);
+
+    return 0;
+}
