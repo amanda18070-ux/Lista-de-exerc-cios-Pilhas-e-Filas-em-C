@@ -1,0 +1,127 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 5 // Capacidade máxima de tarefas simultâneas na fila
+
+typedef struct {
+    int tarefas[MAX]; // Vetor que armazena os identificadores inteiros das tarefas
+    int inicio;       // Mantido sempre em 0 após o deslocamento dos elementos
+    int fim;          // Indica a quantidade atual de tarefas e a próxima posição livre
+} FilaTarefas;
+
+void inicializar(FilaTarefas *f) {
+    f->inicio = 0;
+    f->fim = 0;
+}
+
+int estaVazia(const FilaTarefas *f) {
+    return (f->fim == 0);
+}
+
+int estaCheia(const FilaTarefas *f) {
+    return (f->fim == MAX);
+}
+
+int adicionarTarefa(FilaTarefas *f, int idTarefa) {
+    if (estaCheia(f)) {
+        printf("\n[Erro] Fila de tarefas cheia! Nao e possivel adicionar a tarefa #%d.\n", idTarefa);
+        return 0;
+    }
+    f->tarefas[f->fim] = idTarefa; // Insere a tarefa na próxima posição livre ao final
+    f->fim++;                      // Avança o índice 'fim'
+    return 1;
+}
+
+int removerTarefa(FilaTarefas *f, int *idRemovida) {
+    if (estaVazia(f)) {
+        return 0;
+    
+}
+
+
+void executarRodada(FilaTarefas *f) {
+    int idAtual;
+    int concluida;
+    
+    if (!removerTarefa(f, &idAtual)) {
+        printf("\n[Aviso] A fila esta vazia! Nenhuma tarefa para executar na rodada.\n");
+        return;
+    }
+
+    printf("\n--- Executando Rodada ---\n");
+    printf("Tarefa em execucao: #%d\n", idAtual);
+        printf("A tarefa #%d foi concluida? (1 - Sim / 0 - Nao): ", idAtual);
+        scanf("%d", &concluida);
+
+        if (concluida != 1 && concluida != 0) {
+            printf("[Erro] Resposta invalida! Digite 1 para Sim ou 0 para Nao.\n");
+        }
+    } while (concluida != 1 && concluida != 0);
+
+    if (concluida == 1) {
+        
+        printf("Tarefa #%d concluida e removida definitivamente da fila.\n", idAtual);
+    } else {
+        
+        adicionarTarefa(f, idAtual);
+        printf("Tarefa #%d nao concluida: reinserida no final da fila.\n", idAtual);
+    }
+    printf("-------------------------\n");
+}
+
+void exibirFila(const FilaTarefas *f) {
+    if (estaVazia(f)) {
+        printf("\nA fila de tarefas esta vazia.\n");
+        return;
+    }
+    printf("\n--- Fila de Tarefas (Inicio -> Fim) ---\n");
+    for (int i = f->inicio; i < f->fim; i++) {
+        printf("[ Tarefa #%d ] ", f->tarefas[i]);
+    }
+    printf("\n---------------------------------------\n");
+}
+
+int main() {
+    FilaTarefas fila; // Instância da fila de tarefas em rodízio
+    int opcao;        // Opção escolhida pelo usuário no menu
+    int idTarefa;     // Identificador inteiro da tarefa
+
+    inicializar(&fila);
+
+    do {
+        printf("\n=== SIMULACAO DE RODIZIO DE TAREFAS ===\n");
+        printf("1. Adicionar tarefa\n");
+        printf("2. Executar uma rodada\n");
+        printf("3. Exibir fila de tarefas\n");
+        printf("0. Sair\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                printf("Informe o identificador inteiro da tarefa: ");
+                scanf("%d", &idTarefa);
+                if (adicionarTarefa(&fila, idTarefa)) {
+                    printf("\nTarefa #%d adicionada a fila.\n", idTarefa);
+                }
+                break;
+
+            case 2:
+                executarRodada(&fila);
+                break;
+
+            case 3:
+                exibirFila(&fila);
+                break;
+
+            case 0:
+                printf("\nEncerrando o simulador de rodizio...\n");
+                break;
+
+            default:
+                printf("\n[Erro] Opcao invalida! Tente novamente.\n");
+        }
+    } while (opcao != 0);
+
+    return 0;
+}
