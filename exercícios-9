@@ -1,0 +1,137 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 5 // Capacidade máxima da fila estática
+
+typedef struct {
+    int itens[MAX]; // Vetor que armazena os elementos da fila
+    int inicio;     // Mantido sempre em 0 após o deslocamento dos elementos
+    int fim;        // Indica a quantidade atual de elementos e a próxima posição livre
+} Fila;
+
+void inicializar(Fila *f) {
+    f->inicio = 0;
+    f->fim = 0;
+}
+
+int estaVazia(const Fila *f) {
+    return (f->fim == 0);
+}
+
+int estaCheia(const Fila *f) {
+    return (f->fim == MAX);
+}
+void enfileirar(Fila *f, int valor) {
+    if (estaCheia(f)) {
+        printf("\n[Erro] Fila cheia! Nao e possivel inserir %d.\n", valor);
+        return;
+    }
+    f->itens[f->fim] = valor; // Insere na próxima posição livre ao final
+    f->fim++;                 // Incrementa o fim (que também representa o total de itens)
+    printf("\nElemento %d inserido na fila.\n", valor);
+}
+
+int desenfileirar(Fila *f, int *valorRemovido) {
+    if (estaVazia(f)) {
+        printf("\n[Erro] Fila vazia! Nao ha elementos para remover.\n");
+        return 0;
+    }
+void exibir(const Fila *f) {
+    if (estaVazia(f)) {
+        printf("\nA fila esta vazia.\n");
+        return;
+    }
+    printf("\n--- Conteudo da Fila (Inicio [0] -> Fim [%d]) ---\n", f->fim - 1);
+    for (int i = f->inicio; i < f->fim; i++) {
+        printf("[ %d ] ", f->itens[i]);
+    }
+    printf("\n-------------------------------------------------\n");
+}
+
+void executarTesteObrigatorio() {
+    Fila filaTeste;
+    int removido;
+
+    inicializar(&filaTeste);
+
+    printf("\n=================================================\n");
+    printf("            EXECUTANDO TESTE OBRIGATORIO         \n");
+    printf("=================================================\n");
+
+    // 1. Inserindo cinco valores (capacidade máxima MAX = 5)
+    printf("\n1. Inserindo 5 valores (10, 20, 30, 40, 50)...");
+    enfileirar(&filaTeste, 10);
+    enfileirar(&filaTeste, 20);
+    enfileirar(&filaTeste, 30);
+    enfileirar(&filaTeste, 40);
+    enfileirar(&filaTeste, 50);
+    exibir(&filaTeste);
+
+  
+    printf("\n2. Removendo 2 valores...");
+    if (desenfileirar(&filaTeste, &removido)) {
+        printf("\n1o removido: %d", removido);
+    }
+    if (desenfileirar(&filaTeste, &removido)) {
+        printf("\n2o removido: %d\n", removido);
+    }
+    exibir(&filaTeste);
+
+    printf("\n3. Inserindo 2 novos valores (60, 70)...");
+    enfileirar(&filaTeste, 60);
+    enfileirar(&filaTeste, 70);
+
+    printf("\nResultado final (ordem FIFO preservada: 30, 40, 50, 60, 70):");
+    exibir(&filaTeste);
+    printf("=================================================\n");
+}
+
+int main() {
+    Fila f;    // Instância da estrutura Fila
+    int opcao; // Opção escolhida pelo usuário no menu
+    int valor; // Valor inteiro para inserção ou remoção
+
+    inicializar(&f);
+
+    do {
+        printf("\n=== FILA ESTATICA COM DESLOCAMENTO ===\n");
+        printf("1. Inserir na fila (Enfileirar)\n");
+        printf("2. Remover da fila (Desenfileirar)\n");
+        printf("3. Exibir fila\n");
+        printf("4. Executar teste obrigatorio\n");
+        printf("0. Sair\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                printf("Digite o valor a inserir: ");
+                scanf("%d", &valor);
+                enfileirar(&f, valor);
+                break;
+
+            case 2:
+                if (desenfileirar(&f, &valor)) {
+                    printf("\nElemento removido do inicio: %d\n", valor);
+                }
+                break;
+
+            case 3:
+                exibir(&f);
+                break;
+
+            case 4:
+                executarTesteObrigatorio();
+                break;
+
+            case 0:
+                printf("\nEncerrando o programa...\n");
+                break;
+
+            default:
+                printf("\n[Erro] Opcao invalida! Tente novamente.\n");
+        }
+    } while (opcao != 0);
+
+    return 0;
+}
